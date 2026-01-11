@@ -1,0 +1,124 @@
+[
+  {
+    "nombre": "Puente Gral. Belgrano",
+    "tipo": "puente",
+    "destacado": true,
+    "estrellas": 5,
+    "lat": -27.47293374734846,
+    "lng": -58.8567287671344,
+    "img": "./img/puente.jpg",
+    "desc": "El coloso que une Corrientes y Chaco. Vistas panorámicas."
+  },
+  {
+    "nombre": "Costanera Sur",
+    "tipo": "costa",
+    "estrellas": 5,
+    "lat": -27.477179709006844,
+    "lng": -58.85517680763836,
+    "img": "./img/costaSur.jpg",
+    "desc": "El paseo más moderno frente al río Paraná."
+  },
+  {
+    "nombre": "Plaza 25 de Mayo",
+    "tipo": "plaza",
+    "estrellas": 4,
+    "lat": -27.46304951027638,
+    "lng": -58.83964489120573,
+    "img": "./img/25mayo.jpg",
+    "desc": "Centro histórico, rodeada de la Casa de Gobierno."
+  },
+  {
+    "nombre": "Playa Arazaty",
+    "tipo": "costa",
+    "destacado": true,
+    "estrellas": 5,
+    "lat": -27.475695459179626,
+    "lng": -58.85609350059826,
+    "img": "./img/playaArazaty.jpg",
+    "desc": "La playa más popular. Arena y sol todo el año."
+  },
+  {
+    "nombre": "Parque Cambá Cuá",
+    "tipo": "plaza",
+    "estrellas": 5,
+    "lat": -27.465158557542544,
+    "lng": -58.844778878746695,
+    "img": "./img/cambaCua.jpg",
+    "desc": "El barrio del candombe, cultura y eventos al aire libre."
+  },
+  {
+    "nombre": "Museo de Artesanías",
+    "tipo": "turismo",
+    "estrellas": 4,
+    "lat": -27.462771565078324,
+    "lng": -58.83873956235435,
+    "img": "./img/artesanias.jpg",
+    "desc": "Artesanías tradicionales correntinas en una casa colonial."
+  },
+  {
+    "nombre": "UniPlaza",
+    "tipo": "iglesia",
+    "estrellas": 4,
+    "lat": -27.471600626689433,
+    "lng": -58.85088253372594,
+    "desc": "Lugar histórico de la fundación de la ciudad."
+  },
+  {
+    "nombre": "Shopping Centenario",
+    "tipo": "comida",
+    "estrellas": 4,
+    "lat": -27.472,
+    "lng": -58.805,
+    "desc": "Centro comercial, cine y patio de comidas."
+  },
+  {
+    "nombre": "Parque Mitre",
+    "tipo": "plaza",
+    "estrellas": 4,
+    "lat": -27.46056321041048,
+    "lng": -58.828803317411804,
+    "img": "./img/parqueMitre.jpg",
+    "desc": "Histórico parque con faro y pista de skate."
+  },
+  {
+    "nombre": "Turismo Hotel Casino",
+    "tipo": "hotel",
+    "estrellas": 5,
+    "lat": -27.4615,
+    "lng": -58.84,
+    "desc": "Alojamiento de lujo y entretenimiento.",
+    "wp": "5493794000000"
+  },
+  {
+    "nombre": "Peatonal Junín",
+    "tipo": "turismo",
+    "estrellas": 4,
+    "lat": -27.468,
+    "lng": -58.835,
+    "desc": "Corazón comercial de la ciudad."
+  },
+  {
+    "nombre": "Hospital Escuela",
+    "tipo": "salud",
+    "lat": -27.4745,
+    "lng": -58.833,
+    "desc": "Atención de urgencias.",
+    "wp": "107"
+  },
+  {
+    "nombre": "Farmacia Red",
+    "tipo": "farmacia",
+    "lat": -27.467,
+    "lng": -58.836,
+    "desc": "Farmacia céntrica."
+  },
+  {
+    "nombre": "Museo Amado Bonpland",
+    "tipo": "turismo",
+    "destacado": false,
+    "estrellas": 4,
+    "lat": -27.4655,
+    "lng": -58.8372,
+    "desc": "Museo de ciencias naturales con fauna y flora local."
+  }
+]
