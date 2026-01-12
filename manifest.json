@@ -1,19 +1,19 @@
 {
   "name": "Ruta Correntina",
-  "short_name": "CorrientesApp",
+  "short_name": "RutaCtes",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#F2F2F7",
+  "background_color": "#FFFFFF",
   "theme_color": "#007AFF",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2236/2236962.png",
+      "src": "logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2236/2236962.png",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png"
     }
