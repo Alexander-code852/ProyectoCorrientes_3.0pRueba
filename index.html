@@ -8,11 +8,15 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Ruta Correntina</title>
     
+    <meta property="og:title" content="Ruta Correntina - Guía Turística">
+    <meta property="og:description" content="Descubrí los mejores lugares, hoteles, eventos y paseos de Corrientes Capital.">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2236/2236962.png"> 
+    
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2236/2236962.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
@@ -34,7 +38,7 @@
 
     <div class="top-ui-layer">
         <div class="search-bar-glass">
-            <button class="menu-trigger" onclick="toggleMenuSheet()">
+            <button class="menu-trigger" onclick="toggleMenuSheet('abrir')">
                 <i class="fas fa-bars"></i>
             </button>
             <input type="text" id="buscador-input" placeholder="Buscar lugar, hotel, museo..." onfocus="expandirMenu()" onkeyup="filtrarPorBusqueda()">
@@ -43,6 +47,7 @@
 
         <div id="filter-chips">
             <div class="chip active" onclick="filtrarMapa('todos')">Todo</div>
+            <div class="chip" onclick="filtrarMapa('favoritos')">❤️ Favs</div>
             <div class="chip" onclick="filtrarMapa('turismo')">Paseos</div>
             <div class="chip" onclick="filtrarMapa('gastronomia')">Comer</div>
             <div class="chip" onclick="filtrarMapa('hospedaje')">Dormir</div>
@@ -56,9 +61,14 @@
         </div>
 
         <div class="sheet-header">
-            <div class="titulo-sheet">
-                <h2>Explorar</h2>
-                <p>Corrientes Capital</p>
+            <div class="app-logo">
+                <div class="logo-icon-bg">
+                    <i class="fas fa-map-location-dot"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="txt-ruta">RUTA</span>
+                    <span class="txt-correntina">CORRENTINA</span>
+                </div>
             </div>
             <button id="theme-toggle" onclick="alternarTema()">
                 <i class="fas fa-moon"></i>
@@ -87,7 +97,14 @@
 
             <div class="section-title">CATEGORÍAS</div>
 
-            <div class="grouped-list">
+            <div id="empty-state-msg" style="display:none; text-align:center; padding:20px; color:var(--text-sec);">
+                <i class="fas fa-search" style="font-size:2rem; margin-bottom:10px; opacity:0.5;"></i>
+                <p>No encontramos lugares.</p>
+            </div>
+
+            <div id="skeleton-container"></div>
+
+            <div class="grouped-list" id="lista-principal-container">
                 <div class="categoria-item" id="cat-turismo">
                     <div class="categoria-header" onclick="toggleAcordeon('cat-turismo')">
                         <div class="cat-label"><div class="cat-icon-bg c-blue"><i class="fas fa-camera"></i></div><span>Turismo y Paseos</span></div>
@@ -121,7 +138,8 @@
                 </div>
             </div>
             
-            <div style="height: 120px;"></div> </div>
+            <div style="height: 120px;"></div> 
+        </div>
     </div>
 
     <div class="floating-controls">
@@ -130,7 +148,6 @@
     </div>
 
     <div id="ficha-lugar" class="ficha-container"></div>
-    <div id="btn-cancelar-ruta"></div>
     <div id="toast-container"></div>
 
     <div id="modal-sos" class="modal">
@@ -152,7 +169,7 @@
     <div id="modal-info" class="modal">
         <div class="modal-content">
            <span class="close-btn" onclick="cerrarModal('modal-info')">×</span>
-           <h3>Transporte Urbano</h3>
+           <h3 style="margin-top:0;">🚌 Transporte Urbano</h3>
            <div id="contenedor-horarios" class="horarios-wrapper"></div>
        </div>
     </div>
@@ -160,7 +177,7 @@
     <div id="modal-eventos" class="modal">
        <div class="modal-content">
            <span class="close-btn" onclick="cerrarModal('modal-eventos')">×</span>
-           <h2>📅 Agenda Cultural</h2>
+           <h2 style="margin-top:0;">📅 Agenda Cultural</h2>
            <div id="eventos-container" class="timeline"></div>
        </div>
     </div>
@@ -170,6 +187,7 @@
            <span class="close-btn" onclick="cerrarModal('modal-qr')">×</span>
            <h2>Comparte la App</h2>
            <img id="qr-image" src="" alt="QR" style="width:200px; height:200px; margin-top:15px; border-radius:10px;">
+           <p style="margin-top:10px; font-size:0.9rem; color:var(--text-sec)">Escanea para abrir en otro celular</p>
        </div>
     </div>
 
@@ -177,5 +195,15 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script src="script.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('Service Worker registrado', reg))
+                    .catch(err => console.log('Error SW:', err));
+            });
+        }
+    </script>
 </body>
 </html>
