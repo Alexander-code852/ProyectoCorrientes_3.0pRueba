@@ -1,10 +1,15 @@
 /* ==========================================
-   RUTA CORRENTINA - LÓGICA V31 (CLEAN & FIXED)
+   RUTA CORRENTINA - LÓGICA V35 (FAVORITOS LIST)
    ========================================== */
 
 let map, markers, userMarker, routingControl, gpsWatchId;
 let allLugares = []; 
 let favoritos = JSON.parse(localStorage.getItem('favoritos_v1') || '[]');
+
+const circuitosData = {
+    'historico': [[-27.4697, -58.8313], [-27.4630, -58.8396], [-27.4627, -58.8387], [-27.4644, -58.8396]],
+    'costanera': [[-27.4605, -58.8288], [-27.4614, -58.8381], [-27.4771, -58.8551], [-27.4756, -58.8560]]
+};
 
 const iconosMap = {
     'puente': 'https://cdn-icons-png.flaticon.com/128/2258/2258798.png',
@@ -41,10 +46,25 @@ const eventosCtes = [
     { fecha: "Julio", titulo: "Feria del Libro", desc: "Costanera Sur." }
 ];
 
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.add('dark-mode');
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+    if (event.matches) {
+        document.body.classList.add('dark-mode');
+        setTileLayer('dark');
+    } else {
+        document.body.classList.remove('dark-mode');
+        setTileLayer('light');
+    }
+});
+
 async function initApp() {
     initMap();
     mostrarSkeleton(true); 
     
+    if(document.body.classList.contains('dark-mode')) setTileLayer('dark');
+
     setTimeout(() => {
         const s = document.getElementById('splash-screen');
         if(s) { s.style.opacity = '0'; setTimeout(() => s.remove(), 500); }
@@ -70,7 +90,10 @@ async function initApp() {
         
         allLugares = listaPlana;
         renderizarMarcadores(allLugares);
+        actualizarListaFavoritos(); // <--- INICIALIZAMOS LA LISTA DE FAVS
         mostrarSkeleton(false);
+
+        checkDeepLink();
     } catch (e) {
         console.error("Error JSON:", e);
         mostrarSkeleton(false);
@@ -81,6 +104,41 @@ async function initApp() {
     iniciarGPS(false);
     fetchClima();
     window.addEventListener('popstate', handleBackButton);
+}
+
+// === NUEVA FUNCIÓN PARA LISTA FAVORITOS ===
+function actualizarListaFavoritos() {
+    const ul = document.getElementById('lista-favoritos-panel');
+    if(!ul) return;
+    ul.innerHTML = '';
+    
+    const favObjs = allLugares.filter(l => favoritos.includes(l.nombre));
+    
+    if(favObjs.length === 0) {
+        ul.innerHTML = '<li style="padding:15px; color:var(--text-sec); text-align:center; font-size:0.9rem;">Aún no tienes favoritos.<br>Toca el ❤️ en un lugar para guardarlo.</li>';
+        return;
+    }
+
+    favObjs.forEach(l => {
+        const li = document.createElement('li');
+        li.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:500">${l.nombre}</span>
+                            <small style="color:var(--text-sec); font-size:0.75rem">${l.tipo}</small>
+                        </div>`;
+        li.onclick = () => { map.flyTo([l.lat, l.lng], 17); mostrarFicha(l); toggleMenuSheet('cerrar'); };
+        ul.appendChild(li);
+    });
+}
+
+function checkDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    const nombreLugar = params.get('lugar');
+    if (nombreLugar) {
+        const lugar = allLugares.find(l => l.nombre === nombreLugar);
+        if (lugar) {
+            setTimeout(() => { mostrarFicha(lugar); map.setView([lugar.lat, lugar.lng], 16); }, 500);
+        }
+    }
 }
 
 function handleBackButton(event) {
@@ -209,6 +267,7 @@ window.toggleFavorito = function(nombre) {
     else { favoritos.splice(idx, 1); showToast("Eliminado de favoritos"); }
     localStorage.setItem('favoritos_v1', JSON.stringify(favoritos));
     
+    // Actualizar icono en ficha
     const btn = document.getElementById(`btn-fav-${nombre.replace(/\s/g, '')}`);
     if(btn) {
         btn.classList.toggle('es-favorito');
@@ -216,6 +275,9 @@ window.toggleFavorito = function(nombre) {
         icon.classList.toggle('fas');
         icon.classList.toggle('far');
     }
+    
+    // Actualizar lista en tiempo real
+    actualizarListaFavoritos(); 
 };
 
 function mostrarSkeleton(mostrar) {
@@ -230,9 +292,29 @@ function mostrarSkeleton(mostrar) {
     }
 }
 
+window.iniciarCircuito = function(tipo) {
+    const puntos = circuitosData[tipo];
+    if (!puntos) return;
+    const waypoints = puntos.map(p => L.latLng(p[0], p[1]));
+    
+    toggleMenuSheet('cerrar');
+    document.querySelector('.top-ui-layer').classList.add('hide-up'); 
+    document.getElementById('bottom-sheet').classList.add('oculto-total');
+    document.querySelector('.floating-controls').classList.add('oculto-en-ruta');
+    showToast(`Iniciando circuito ${tipo}...`, "info");
+    
+    if (routingControl) try { map.removeControl(routingControl); } catch(e){}
+    routingControl = L.Routing.control({ 
+        waypoints: waypoints, 
+        router: new L.Routing.osrmv1({ language: 'es', profile: 'car' }),
+        routeWhileDragging: false, showAlternatives: false, fitSelectedRoutes: true, createMarker: () => null, 
+        lineOptions: { styles: [{color: 'black', opacity: 0.4, weight: 10}, {color: '#FF9500', opacity: 1, weight: 7}] } 
+    }).addTo(map);
+    setupRoutingUI();
+};
+
 window.irRutaGPS = function(dLat, dLng) { 
     if (!userMarker) { alert("⚠️ Activando GPS... permite la ubicación."); iniciarGPS(true); return; }
-    
     cerrarFicha(); toggleMenuSheet('cerrar');
     document.querySelector('.top-ui-layer').classList.add('hide-up'); 
     document.getElementById('bottom-sheet').classList.add('oculto-total');
@@ -248,7 +330,10 @@ window.irRutaGPS = function(dLat, dLng) {
         routeWhileDragging: false, showAlternatives: false, fitSelectedRoutes: true, createMarker: () => null, 
         lineOptions: { styles: [{color: 'black', opacity: 0.4, weight: 10}, {color: '#30D158', opacity: 1, weight: 7}] } 
     }).addTo(map);
+    setupRoutingUI();
+};
 
+function setupRoutingUI() {
     routingControl.on('routesfound', function(e) {
         const routes = e.routes;
         const summary = routes[0].summary;
@@ -285,11 +370,8 @@ window.irRutaGPS = function(dLat, dLng) {
             }
         }, 100);
     });
-    routingControl.on('routingerror', function() {
-        showToast("Error ruta. Abriendo Maps...", "error");
-        setTimeout(() => { window.open(`https://www.google.com/maps/dir/?api=1&destination=${dLat},${dLng}&travelmode=driving`, '_blank'); cancelarRuta(); }, 1500);
-    });
-};
+    routingControl.on('routingerror', function() { showToast("Error ruta. Reintentando...", "error"); });
+}
 
 window.cancelarRuta = function(e) { 
     if(e && e.stopPropagation) e.stopPropagation();
@@ -297,7 +379,6 @@ window.cancelarRuta = function(e) {
     document.querySelector('.top-ui-layer').classList.remove('hide-up');
     document.getElementById('bottom-sheet').classList.remove('oculto-total');
     document.querySelector('.floating-controls').classList.remove('oculto-en-ruta');
-
     if(userMarker) map.setView(userMarker.getLatLng(), 16); 
     if(gpsWatchId) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
     const container = document.querySelector('.leaflet-routing-container');
@@ -320,10 +401,14 @@ function iniciarGPS(continuo = false) {
     const onPos = (pos) => { const latlng = [pos.coords.latitude, pos.coords.longitude]; if(!userMarker) { const userIcon = L.divIcon({className: 'user-location-dot', html: '<div class="dot-core"></div><div class="dot-pulse"></div>', iconSize: [20, 20]}); userMarker = L.marker(latlng, {icon: userIcon}).addTo(map); } else { userMarker.setLatLng(latlng); } };
     if (continuo) { if(gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = navigator.geolocation.watchPosition(onPos, err => console.log(err), {enableHighAccuracy: true}); } else { navigator.geolocation.getCurrentPosition(onPos, err => console.log(err), {enableHighAccuracy: true}); }
 }
+document.addEventListener("visibilitychange", () => { if (document.hidden && gpsWatchId) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; } });
 
 window.cargarTransporte = function() { const contenedor = document.getElementById('contenedor-horarios'); contenedor.innerHTML = ''; datosTransporte.forEach(t => { const item = document.createElement('div'); item.className = 'transporte-card'; item.innerHTML = `<h4 style="margin:0; color:var(--primary); font-size:1.1rem;">${t.empresa}</h4><div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-top:8px;"><span><strong>Ida:</strong> ${t.horarios.ida.join(', ')}</span><span><strong>Vuelta:</strong> ${t.horarios.vuelta.join(', ')}</span></div>`; contenedor.appendChild(item); }); toggleMenuSheet('cerrar'); abrirModal('modal-info'); };
 window.cargarEventos = function() { const container = document.getElementById('eventos-container'); container.innerHTML = ''; eventosCtes.forEach(e => { const div = document.createElement('div'); div.className = 'evento-item'; div.innerHTML = `<div class="evento-fecha">${e.fecha}</div><div class="evento-info"><strong style="display:block; font-size:1rem;">${e.titulo}</strong><p>${e.desc}</p></div>`; container.appendChild(div); }); toggleMenuSheet('cerrar'); abrirModal('modal-eventos'); };
-window.compartirLugarNativo = function(nombre, desc) { if (navigator.share) { navigator.share({ title: 'Ruta Correntina', text: `¡Mira este lugar en Corrientes! ${nombre} - ${desc}`, url: window.location.href }).catch(console.error); } else { mostrarQR(); } };
+window.compartirLugarNativo = function(nombre, desc) { 
+    const url = `${window.location.origin}${window.location.pathname}?lugar=${encodeURIComponent(nombre)}`;
+    if (navigator.share) { navigator.share({ title: 'Ruta Correntina', text: `¡Mira este lugar en Corrientes! ${nombre} - ${desc}`, url: url }).catch(console.error); } else { mostrarQR(); } 
+};
 function toggleMenuSheet(accion) { const sheet = document.getElementById('bottom-sheet'); if(accion === 'abrir') { sheet.classList.remove('cerrado'); sheet.classList.add('abierto'); history.pushState({menu: 'abierto'}, null, ""); } else if (accion === 'cerrar') { sheet.classList.remove('abierto'); sheet.classList.add('cerrado'); } else { sheet.classList.toggle('abierto'); sheet.classList.toggle('cerrado'); if(sheet.classList.contains('abierto')) history.pushState({menu: 'abierto'}, null, ""); } }
 window.filtrarMapa = function(cat) { 
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); 

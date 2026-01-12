@@ -10,13 +10,13 @@
     
     <meta property="og:title" content="Ruta Correntina - Guía Turística">
     <meta property="og:description" content="Descubrí los mejores lugares, hoteles, eventos y paseos de Corrientes Capital.">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2236/2236962.png"> 
     
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2236/2236962.png">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
@@ -30,9 +30,16 @@
 
     <div id="splash-screen">
         <div class="splash-content">
-            <span class="intro-tag">DESCUBRÍ</span>
-            <h1 class="brand-name">RUTA<br>CORRENTINA</h1>
-            <div class="loading-wrapper"><div class="loading-bar"></div></div>
+            <div class="logo-container-anim">
+                <img src="logo.png" alt="Ruta Correntina Logo" class="splash-logo">
+            </div>
+            <h2 class="splash-slogan">Descubrí tu ciudad</h2>
+            
+            <div class="spinner-box">
+                <div class="circle-border">
+                    <div class="circle-core"></div>
+                </div>  
+            </div>
         </div>
     </div>
 
@@ -77,9 +84,9 @@
 
         <div class="sheet-content">
             <div class="quick-actions-grid">
-                <div class="action-card" onclick="verCercanos()">
-                    <div class="icon-box blue"><i class="fas fa-location-arrow"></i></div>
-                    <span>Cerca</span>
+                <div class="action-card" onclick="filtrarMapa('favoritos')">
+                    <div class="icon-box pink"><i class="fas fa-heart"></i></div>
+                    <span>Favoritos</span>
                 </div>
                 <div class="action-card" onclick="cargarTransporte()">
                     <div class="icon-box green"><i class="fas fa-bus"></i></div>
@@ -95,6 +102,24 @@
                 </div>
             </div>
 
+            <div class="section-title">CIRCUITOS RECOMENDADOS</div>
+            <div class="circuitos-scroll">
+                <div class="circuito-card c-historico" onclick="iniciarCircuito('historico')">
+                    <i class="fas fa-landmark"></i>
+                    <div>
+                        <strong>Casco Histórico</strong>
+                        <span>Plazas e Iglesias</span>
+                    </div>
+                </div>
+                <div class="circuito-card c-costa" onclick="iniciarCircuito('costanera')">
+                    <i class="fas fa-water"></i>
+                    <div>
+                        <strong>Ruta Costera</strong>
+                        <span>Río y Playas</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="section-title">CATEGORÍAS</div>
 
             <div id="empty-state-msg" style="display:none; text-align:center; padding:20px; color:var(--text-sec);">
@@ -105,6 +130,15 @@
             <div id="skeleton-container"></div>
 
             <div class="grouped-list" id="lista-principal-container">
+                
+                <div class="categoria-item" id="cat-favoritos-panel">
+                    <div class="categoria-header" onclick="toggleAcordeon('cat-favoritos-panel')">
+                        <div class="cat-label"><div class="cat-icon-bg pink"><i class="fas fa-heart"></i></div><span>Tus Favoritos</span></div>
+                        <i class="fas fa-chevron-right chevron"></i>
+                    </div>
+                    <ul id="lista-favoritos-panel" class="lista-lugares"></ul>
+                </div>
+
                 <div class="categoria-item" id="cat-turismo">
                     <div class="categoria-header" onclick="toggleAcordeon('cat-turismo')">
                         <div class="cat-label"><div class="cat-icon-bg c-blue"><i class="fas fa-camera"></i></div><span>Turismo y Paseos</span></div>
