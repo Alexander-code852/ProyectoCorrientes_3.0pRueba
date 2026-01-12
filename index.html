@@ -34,11 +34,8 @@
                 <img src="logo.png" alt="Ruta Correntina Logo" class="splash-logo">
             </div>
             <h2 class="splash-slogan">Descubrí tu ciudad</h2>
-            
             <div class="spinner-box">
-                <div class="circle-border">
-                    <div class="circle-core"></div>
-                </div>  
+                <div class="circle-border"><div class="circle-core"></div></div>  
             </div>
         </div>
     </div>
@@ -48,12 +45,13 @@
             <button class="menu-trigger" onclick="toggleMenuSheet('abrir')">
                 <i class="fas fa-bars"></i>
             </button>
-            <input type="text" id="buscador-input" placeholder="Buscar lugar, hotel, museo..." onfocus="expandirMenu()" onkeyup="filtrarPorBusqueda()">
+            <input type="text" id="buscador-input" placeholder="Buscar 'milanesa', 'museo'..." onfocus="expandirMenu()" onkeyup="filtrarPorBusqueda()">
             <div id="clima-widget" class="weather-badge"><i class="fas fa-sync fa-spin"></i></div>
         </div>
 
         <div id="filter-chips">
             <div class="chip active" onclick="filtrarMapa('todos')">Todo</div>
+            <div class="chip" onclick="ordenarPorCercania()">📍 Cercanos</div>
             <div class="chip" onclick="filtrarMapa('favoritos')">❤️ Favs</div>
             <div class="chip" onclick="filtrarMapa('turismo')">Paseos</div>
             <div class="chip" onclick="filtrarMapa('gastronomia')">Comer</div>
@@ -92,13 +90,13 @@
                     <div class="icon-box green"><i class="fas fa-bus"></i></div>
                     <span>Bus</span>
                 </div>
-                <div class="action-card" onclick="cargarEventos()">
-                    <div class="icon-box orange"><i class="fas fa-calendar-alt"></i></div>
-                    <span>Agenda</span>
+                <div class="action-card" onclick="abrirLogros()">
+                    <div class="icon-box purple"><i class="fas fa-trophy"></i></div>
+                    <span>Logros</span>
                 </div>
-                <div class="action-card" onclick="mostrarQR()">
-                    <div class="icon-box purple"><i class="fas fa-qrcode"></i></div>
-                    <span>App</span>
+                <div class="action-card" onclick="sugerirLugar()">
+                    <div class="icon-box blue"><i class="fas fa-plus"></i></div>
+                    <span>Sugerir</span>
                 </div>
             </div>
 
@@ -130,7 +128,6 @@
             <div id="skeleton-container"></div>
 
             <div class="grouped-list" id="lista-principal-container">
-                
                 <div class="categoria-item" id="cat-favoritos-panel">
                     <div class="categoria-header" onclick="toggleAcordeon('cat-favoritos-panel')">
                         <div class="cat-label"><div class="cat-icon-bg pink"><i class="fas fa-heart"></i></div><span>Tus Favoritos</span></div>
@@ -138,7 +135,6 @@
                     </div>
                     <ul id="lista-favoritos-panel" class="lista-lugares"></ul>
                 </div>
-
                 <div class="categoria-item" id="cat-turismo">
                     <div class="categoria-header" onclick="toggleAcordeon('cat-turismo')">
                         <div class="cat-label"><div class="cat-icon-bg c-blue"><i class="fas fa-camera"></i></div><span>Turismo y Paseos</span></div>
@@ -146,7 +142,6 @@
                     </div>
                     <ul id="lista-turismo" class="lista-lugares"></ul>
                 </div>
-                
                 <div class="categoria-item" id="cat-gastronomia">
                     <div class="categoria-header" onclick="toggleAcordeon('cat-gastronomia')">
                         <div class="cat-label"><div class="cat-icon-bg c-orange"><i class="fas fa-utensils"></i></div><span>Gastronomía</span></div>
@@ -154,7 +149,6 @@
                     </div>
                     <ul id="lista-gastronomia" class="lista-lugares"></ul>
                 </div>
-
                 <div class="categoria-item" id="cat-hospedaje">
                     <div class="categoria-header" onclick="toggleAcordeon('cat-hospedaje')">
                         <div class="cat-label"><div class="cat-icon-bg c-indigo"><i class="fas fa-bed"></i></div><span>Alojamiento</span></div>
@@ -162,7 +156,6 @@
                     </div>
                     <ul id="lista-hospedaje" class="lista-lugares"></ul>
                 </div>
-
                 <div class="categoria-item" id="cat-servicios">
                     <div class="categoria-header" onclick="toggleAcordeon('cat-servicios')">
                         <div class="cat-label"><div class="cat-icon-bg c-red"><i class="fas fa-plus-circle"></i></div><span>Servicios y Salud</span></div>
@@ -171,11 +164,15 @@
                     <ul id="lista-servicios" class="lista-lugares"></ul>
                 </div>
             </div>
-            
             <div style="height: 120px;"></div> 
         </div>
     </div>
 
+<<<<<<< main
+        <div class="sidebar-footer">
+            <p>Desarrollado con <i class="fas fa-heart" style="color:#ff4757"></i> por <strong>TechFix</strong></p>
+            <p style="font-size:0.7rem; opacity:0.7;">Versión Capital 6.0</p>
+=======
     <div class="floating-controls">
         <button onclick="centrarMapaUsuario()" class="fab-btn"><i class="fas fa-crosshairs"></i></button>
         <button onclick="abrirSOS()" class="fab-btn sos"><i class="fas fa-bell"></i></button>
@@ -197,6 +194,7 @@
                 <a href="tel:911" class="btn-sos-call policia">Policía (911)</a>
                 <a href="tel:107" class="btn-sos-call hospital">Ambulancia (107)</a>
             </div>
+>>>>>>> local
         </div>
     </div>
 
@@ -216,6 +214,16 @@
        </div>
     </div>
 
+    <div id="modal-logros" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <span class="close-btn" onclick="cerrarModal('modal-logros')">×</span>
+            <h2>🏆 Tus Logros</h2>
+            <p style="color:var(--text-sec); font-size:0.9rem;">Visita lugares y haz "Check-in" para ganar medallas.</p>
+            <div id="logros-container" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
+                </div>
+        </div>
+    </div>
+
     <div id="modal-qr" class="modal">
        <div class="modal-content" style="text-align:center;">
            <span class="close-btn" onclick="cerrarModal('modal-qr')">×</span>
@@ -233,9 +241,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(reg => console.log('Service Worker registrado', reg))
-                    .catch(err => console.log('Error SW:', err));
+                navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('Error SW:', err));
             });
         }
     </script>
